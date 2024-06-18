@@ -28,8 +28,8 @@ For this lab I am using VirtualBox and creating a Windows 10 virtual machine.
 Once the Windows 10 virtual machine setup is complete we can start installing the tools for this lab
 
 
-Installing and Configuring Splunk:
-Step 3: Download and Install Splunk: Download the Splunk Enterprise installer from the official website and follow the installation instructions.
+Step 3: Installing and Configuring Splunk:
+ Download and Install Splunk: Download the Splunk Enterprise installer from the official website and follow the installation instructions.
 
 Splunk
 Products > splunk enterprise > free trial (need to create an account)
@@ -38,19 +38,57 @@ Step 4: Configure Splunk:
 Set up basic configurations such as admin password, data inputs, and indexes.
 Configure data inputs to accept Windows event logs and any other relevant data sources.
 
+After the setup is finished it should launch a web browser with splunk enterprise. You will use the username and password you created to log in.
+
+Step 5: Event Log Collection and Ingestion.
+
+Step 6: Configure Event Log Collection in Splunk:
+Use Splunk’s data inputs configuration to monitor Windows event logs and other relevant log files on your VM.
+Configure Splunk to ingest these logs directly without setting up event log forwarding in Windows Event Viewer.
+We can add our data by going to Settings-> Add Data-> Monitor-> Local Event Logs and selecting the information we would like to add
+
+We can review our selections and complete and go to search our data
+
+Step 6: Verify Log Collection:
+Generate test events on your VM to ensure they are being monitored and ingested by Splunk.
+Monitor Splunk to confirm that the events are being received and indexed.
+
+After the test is executed we will go over to splunk to look for information.
+
+Step 7: Querying Data in Splunk:
+Access Splunk Web Interface: Open a web browser and navigate to the Splunk web interface running on your VM.
+
+Step 8: Craft Search Queries:
+Use the Splunk search interface to craft queries to analyze ingested event data.
+Start with simple queries and gradually increase complexity.
+I used the query here to find the attack:
+
+index=main EventCode=1
+| search (Image=*outlook.exe* OR Image=*powershell.exe* OR Image=*cmd.exe*) (CommandLine=*attachment* OR CommandLine=*download* OR CommandLine=*execute* OR CommandLine=*run* OR CommandLine=*open*)
+| table _time, Image, CommandLine, ParentImage
+
+Explanation of the query:
+
+index=main: Specifies that we are searching within the Sysmon logs index.
+EventCode=1: Filters the events to include only process creation events.
+search (Image=*outlook.exe* OR Image=*powershell.exe* OR Image=*cmd.exe*): Filters the events to include only those where the process image contains “outlook.exe”, “powershell.exe”, or “cmd.exe”, which are commonly associated with email clients or execution of scripts.
+(CommandLine=*attachment* OR CommandLine=*download* OR CommandLine=*execute* OR CommandLine=*run* OR CommandLine=*open*): Filters the events to include only those where the command line contains keywords related to downloading, executing, or opening attachments, which are common actions in phishing attacks.
+table _time, Image, CommandLine, ParentImage: Displays the timestamp, process image, command line, and parent process image in the search results.
+
+Step 9: Analyze Results:
+Analyze search results to identify patterns, anomalies, and potential threats.
+
+Step 10: Clean Up:
+Make Sure to clean up after the attack by following the instructions from atomic red team
+For this specific attack I ran:
+
+Remove-Item $env:TEMP\PhishingAttachment.xlsm -ErrorAction Ignore
 
 
 
-
-
-
-
-
-
-drag & drop screenshots here or use imgur and reference them using imgsrc
-
+((drag & drop screenshots here or use imgur and reference them using imgsrc
 Every screenshot should have some text explaining what the screenshot is about.
-
 Example below.
+*Ref 1: Network Diagram*))
 
-*Ref 1: Network Diagram*
+
